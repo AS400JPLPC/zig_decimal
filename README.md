@@ -244,3 +244,4 @@ dcml.deinitDcml()
  sp;&nbsp;&larr; 2025-03-06  **I've finished checking and testing for memory leaks, and the functions have been reviewed and corrected.</br>
 I still have to test and normalize, I'm trying to get back to the AS400, same result and same possibility.**
 <br>
+sp;&nbsp;&larr; 2025-03-07  zig 0.14.0
