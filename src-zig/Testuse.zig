@@ -254,7 +254,7 @@ c.setDcml("12345.68541");
 c.round();
 std.debug.print("control 12345.68541 c.round()  c:{s}; \r\n",.{c.string()});
 
-c.setDcml("12345.68451");
+c.setDcml("-12345.68451");
 c.round();
 std.debug.print("control 12345.68451 c.round()  c:{s}; \r\n",.{c.string()});
 
@@ -281,7 +281,7 @@ c.trunc();
 std.debug.print("control 12345.68421 c.trunc()  c:{s}; \r\n",.{c.string()});
 
 
-c.setDcml("12345.68781");
+c.setDcml("-12345.68781");
 c.trunc();
 std.debug.print("control 12345.68721 c.trunc()  c:{s}; \r\n",.{c.string()});
 
@@ -340,11 +340,11 @@ dcml.deinitDcml();
         .Add = .{
             .left  = &dcml.Expr{ 
                 .Div = .{
-                    .left  = &dcml.Expr{ .Val = 2 },
+                    .left  = &dcml.Expr{ .Val = -2 },
                     .right = &dcml.Expr{ .Val = 1 },
                 },
             },
-            .right = &dcml.Expr{ .Val = 1 },
+            .right = &dcml.Expr{ .Val = -1 },
         }    
    
     };

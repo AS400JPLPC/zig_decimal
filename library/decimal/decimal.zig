@@ -71,7 +71,7 @@ pub const DCMLFX = struct {
 
 	// Frees the storage memory of DCMLFX
 	pub fn deinit(dst: *DCMLFX) void {
-		dst.isBad();
+		if ( dst.entier == 0 and dst.scale == 0 ) return
 		allocDcml.free(result);
 		allocDcml.free(work);
 		dst.entier = 0;
@@ -86,18 +86,6 @@ pub const DCMLFX = struct {
 			txt,
 			dst.val, dst.entier, dst.scale});
 	}
-
-
-	// check if the value is bad
-	pub fn isBad(dst: DCMLFX) void{
-		if ( dst.entier == 0 and dst.scale == 0 ) {
-			const s = @src();
-            @panic( std.fmt.allocPrint(allocDcml,
-            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d}) out-of-service FIELD err:{}\n\r"
-            ,.{s.file, s.line, s.column,s.fn_name,dst.val, Error.Failed_Number})
-            	catch unreachable);
-        }
-    }    
 
 
 	// Check if it's a number
@@ -163,7 +151,14 @@ pub const DCMLFX = struct {
 /// @return : true si la partie entière dépasse les limites, false sinon.
 
 	pub fn isOverflow (dst: *DCMLFX) bool {
-		dst.isBad();
+		if ( dst.entier == 0 and dst.scale == 0 ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val, Error.Failed_Number})
+            	catch unreachable);
+        }
+
 		work = std.fmt.allocPrint(allocDcml, "{d}",.{dst.val}) catch unreachable;
 		defer allocDcml.free(work);
 		var iter = iterator(work);
@@ -187,7 +182,14 @@ pub const DCMLFX = struct {
 
 	// You are responsible for the value.
 	pub fn setDcml(dst: *DCMLFX, str: [] const u8)  void {
-		dst.isBad();
+		if ( dst.entier == 0 and dst.scale == 0 ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{s}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,str, Error.Failed_Number})
+            	catch unreachable);
+        }
+
 		if (!isNumber(str)) { 
 				const s = @src();
                 @panic( std.fmt.allocPrint(allocDcml,
@@ -208,27 +210,47 @@ pub const DCMLFX = struct {
 
 	// You are responsible for the value.
 	pub fn set(dst: *DCMLFX, n: f128)  void {
-		dst.isBad();
+		if ( dst.entier == 0 and dst.scale == 0 ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,n, Error.Failed_Number})
+            	catch unreachable);
+        }
+
 		dst.val = n;
 	}
 
 	// setZeros and add B.
 	pub fn zadd(dst: *DCMLFX ,src: DCMLFX) void {
-		dst.isBad(); src.isBad();
+		if ( (dst.entier == 0 and dst.scale == 0) or ( src.entier == 0 and src.scale == 0) ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,src.val, Error.Failed_Number})
+            	catch unreachable);
+        }
 		dst.val = src.val;
-				if(dst.isOverflow()) { 
-				const s = @src();
-                @panic( std.fmt.allocPrint(allocDcml,
-                "\n\n\r file:{s} line:{d} column:{d} func:{s}({d:.0}) err:{}  MAX_entier:{d} \n\r"
-                ,.{s.file, s.line, s.column,s.fn_name,dst.val,Error.Overflow_number,dst.entier })
-                	catch unreachable);
+		if(dst.isOverflow()) { 
+			const s = @src();
+	        @panic( std.fmt.allocPrint(allocDcml,
+	        "\n\n\r file:{s} line:{d} column:{d} func:{s}({d:.0}) err:{}  MAX_entier:{d} \n\r"
+	        ,.{s.file, s.line, s.column,s.fn_name,dst.val,Error.Overflow_number,dst.entier })
+	        	catch unreachable);
         }
     }
 
 
 	// set "0" 
 	pub fn setZeros(dst: *DCMLFX) void {
-		dst.isBad();
+		if ( dst.entier == 0 and dst.scale == 0 ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val, Error.Failed_Number})
+            	catch unreachable);
+        }
+
 		dst.val = 0;
 	}
 
@@ -237,7 +259,14 @@ pub const DCMLFX = struct {
 
 	// isZeros 
 	pub fn isZeros(dst: DCMLFX) bool{
-		dst.isBad();
+		if ( dst.entier == 0 and dst.scale == 0 ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val, Error.Failed_Number})
+            	catch unreachable);
+        }
+
 		if ( 0 == dst.val or 0.0 == dst.val) return true 
 		else return false;
 	}
@@ -248,7 +277,14 @@ pub const DCMLFX = struct {
 	// ARRONDI comptable / commercial
 	// round and truncate  5 => + 1
 	pub fn round(dst: *DCMLFX) void {
-		dst.isBad();
+		if ( dst.entier == 0 and dst.scale == 0 ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val, Error.Failed_Number})
+            	catch unreachable);
+        }
+
 		var r: f128 = dst.val;
 		var i : usize = 1;
 		const m: c_int = 10;
@@ -271,7 +307,14 @@ pub const DCMLFX = struct {
 	}
 
 	pub fn roundTo(dst: *DCMLFX, a: DCMLFX) void {
-		dst.isBad();
+		if ( (dst.entier == 0 and dst.scale == 0) or ( a.entier == 0 and a.scale == 0) ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,a.val, Error.Failed_Number})
+            	catch unreachable);
+        }
+
 		var r: f128 = a.val;
 
 		var i : usize  = 1;
@@ -300,7 +343,14 @@ pub const DCMLFX = struct {
 
 	// truncate without rounding 
 	pub fn trunc(dst: *DCMLFX) void {
-		dst.isBad();
+		if ( dst.entier == 0 and dst.scale == 0 ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val, Error.Failed_Number})
+            	catch unreachable);
+        }
+
 		var r: f128 = dst.val;
 		var i : i128 = 1;
 		const m: c_int = 10;
@@ -320,7 +370,13 @@ pub const DCMLFX = struct {
 
 	
 	pub fn truncTo(dst: *DCMLFX, a : DCMLFX) void {
-		dst.isBad();
+		if ( (dst.entier == 0 and dst.scale == 0) or ( a.entier == 0 and a.scale == 0) ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,a.val, Error.Failed_Number})
+            	catch unreachable);
+        }
 		var r: f128 = a.val;
 		var i : usize = 1;
 		const m: c_int = 10;
@@ -345,7 +401,14 @@ pub const DCMLFX = struct {
 /// @return : Une chaîne de caractères représentant la valeur normalisée.
 // Returns a formatted string for gestion, statistique ...
 	pub fn string(dst: *DCMLFX ) [] const u8 {
-        dst.isBad();
+        if ( dst.entier == 0 and dst.scale == 0 ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val, Error.Failed_Number})
+            	catch unreachable);
+        }
+
 		if(dst.isOverflow()) { 
 				const s = @src();
                 @panic( std.fmt.allocPrint(allocDcml,
@@ -403,11 +466,24 @@ pub const DCMLFX = struct {
 
 	// function ADD
 	pub fn add(dst: *DCMLFX ,a: DCMLFX) void {
-		dst.isBad(); a.isBad();
+		if ( (dst.entier == 0 and dst.scale == 0) or ( a.entier == 0 and a.scale == 0) ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,a.val, Error.Failed_Number})
+            	catch unreachable);
+        }
 		dst.val += a.val;
 	}
 	pub fn @"+"(dst: *DCMLFX ,n: f128) void {
-		dst.isBad(); 
+		if ( dst.entier == 0 and dst.scale == 0 ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,n, Error.Failed_Number})
+            	catch unreachable);
+        }
+ 
 		dst.val += n;
 	}
 
@@ -415,7 +491,15 @@ pub const DCMLFX = struct {
 
 	// function ADD
 	pub fn addTo(dst: *DCMLFX , a: DCMLFX ,b: DCMLFX) void {
-		dst.isBad(); a.isBad(); b.isBad();
+		if ( (dst.entier == 0 and dst.scale == 0) or
+			 ( a.entier == 0 and a.scale == 0)  or
+			 ( b.entier == 0 and b.scale == 0)  ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,a.val,b.val, Error.Failed_Number})
+            	catch unreachable);
+        }
 		dst.val = a.val + b.val;
 	}
 
@@ -424,11 +508,24 @@ pub const DCMLFX = struct {
 
 	// function SUB
 	pub fn sub(dst: *DCMLFX ,a: DCMLFX) void {
-		dst.isBad(); a.isBad();
+		if ( (dst.entier == 0 and dst.scale == 0) or ( a.entier == 0 and a.scale == 0) ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,a.val, Error.Failed_Number})
+            	catch unreachable);
+        }
+
 		dst.val -= a.val;
 	}
 	pub fn @"-"(dst: *DCMLFX ,n: f128) void {
-		dst.isBad();
+		if ( dst.entier == 0 and dst.scale == 0 ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,n, Error.Failed_Number})
+            	catch unreachable);
+        }
 		dst.val -= n;
 	}
 
@@ -436,8 +533,16 @@ pub const DCMLFX = struct {
 
 	// function SUB
 	pub fn subTo(dst: *DCMLFX ,a: DCMLFX ,b: DCMLFX) void {
-		dst.isBad(); a.isBad(); b.isBad();
-		dst.val = a.val - b.val;
+		if ( (dst.entier == 0 and dst.scale == 0) or
+			 ( a.entier == 0 and a.scale == 0)  or
+			 ( b.entier == 0 and b.scale == 0)  ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,a.val,b.val, Error.Failed_Number})
+            	catch unreachable);
+        }
+        dst.val = a.val - b.val;
 	}
 
 
@@ -445,20 +550,42 @@ pub const DCMLFX = struct {
 
 	// function mult
 	pub fn mult(dst: *DCMLFX ,a: DCMLFX) void {
-		dst.isBad(); a.isBad();
+		if ( (dst.entier == 0 and dst.scale == 0) or ( a.entier == 0 and a.scale == 0) ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,a.val, Error.Failed_Number})
+            	catch unreachable);
+        }
 		dst.val *= a.val;
 	}
-	pub fn @"*"(dst: *DCMLFX , n: f128) void {
-		dst.isBad(); 
-		dst.val *= n;
 
+	pub fn @"*"(dst: *DCMLFX , n: f128) void {
+		if ( dst.entier == 0 and dst.scale == 0 ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,n, Error.Failed_Number})
+            	catch unreachable);
+        }
+
+		dst.val *= n;
 	}
 
 
 
 	// function mult
 	pub fn multTo(dst: *DCMLFX ,a: DCMLFX ,b: DCMLFX) void {
-		dst.isBad(); a.isBad(); b.isBad();
+		if ( (dst.entier == 0 and dst.scale == 0) or
+			 ( a.entier == 0 and a.scale == 0)  or
+			 ( b.entier == 0 and b.scale == 0)  ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,a.val,b.val, Error.Failed_Number})
+            	catch unreachable);
+        }
+
 		dst.val = a.val * b.val;
 	}
 
@@ -466,17 +593,30 @@ pub const DCMLFX = struct {
 
 	// function div
 	pub fn div(dst: *DCMLFX ,a: DCMLFX) bool {
-		dst.isBad(); a.isBad();
-		if (a.val == 0 or a.val == 0.0) return false;
-		
+		if ( (dst.entier == 0 and dst.scale == 0) or ( a.entier == 0 and a.scale == 0) ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val, a.val, Error.Failed_Number})
+            	catch unreachable);
+        }
+        if (a.val == 0 or a.val == 0.0) return false;
+
 		dst.val /= a.val;
 		return true;
 	}
 
 	pub fn @"/"(dst: *DCMLFX , n: f128) bool {
-		dst.isBad(); 
+		if ( dst.entier == 0 and dst.scale == 0 ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,n, Error.Failed_Number})
+            	catch unreachable);
+        }
+
 		if (n == 0 or n == 0.0) return false;
-		
+
 		dst.val /= n;
 		return true;
 	}
@@ -484,10 +624,18 @@ pub const DCMLFX = struct {
 
 	// function div
 	pub fn divTo(dst: *DCMLFX ,a: DCMLFX ,b: DCMLFX) bool {
-		dst.isBad(); a.isBad(); b.isBad();
+		if ( (dst.entier == 0 and dst.scale == 0) or
+			 ( a.entier == 0 and a.scale == 0)  or
+			 ( b.entier == 0 and b.scale == 0)  ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val, a.val,b.val, Error.Failed_Number})
+            	catch unreachable);
+        }
 
 		if (b.val == 0 or b.val == 0.0) return false;
-		
+
 		dst.val = a.val / b.val;
 		return true;
 	}
@@ -495,7 +643,13 @@ pub const DCMLFX = struct {
 
 	// // function Floor
 	pub fn floor(dst: *DCMLFX) void {
-		dst.isBad(); 
+		if ( dst.entier == 0 and dst.scale == 0 ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val, Error.Failed_Number})
+            	catch unreachable);
+        } 
 		dst.val = @floor(dst.val);
 	}
 
@@ -503,7 +657,13 @@ pub const DCMLFX = struct {
 
 	// // function ceiling
 	pub fn ceil(dst: *DCMLFX) void {
-		dst.isBad();
+		if ( dst.entier == 0 and dst.scale == 0 ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val, Error.Failed_Number})
+            	catch unreachable);
+        }
 		dst.val = @ceil(dst.val);
 	}
 
@@ -514,7 +674,16 @@ pub const DCMLFX = struct {
 /// @param b : Nombre décimal diviseur.
 /// @return : true si l'opération a réussi, false si b est égal à zéro.
 	pub fn rem(dst: *DCMLFX ,a: DCMLFX ,b: DCMLFX) bool {
-		dst.isBad(); a.isBad(); b.isBad();
+		if ( (dst.entier == 0 and dst.scale == 0) or
+			 ( a.entier == 0 and a.scale == 0)  or
+			 ( b.entier == 0 and b.scale == 0)  ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val, a.val, b.val, Error.Failed_Number})
+            	catch unreachable);
+        }
+
 		if (b.val == 0 ) return false;
 		dst.val = @rem(a.val , b.val);
 		return true;
@@ -523,7 +692,16 @@ pub const DCMLFX = struct {
 
 	// function calculation of percentage
 	pub fn getpercent(dst: *DCMLFX ,a: DCMLFX , b: DCMLFX) bool {
-		dst.isBad(); a.isBad(); b.isBad();
+		if ( (dst.entier == 0 and dst.scale == 0) or
+			 ( a.entier == 0 and a.scale == 0)  or
+			 ( b.entier == 0 and b.scale == 0)  ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d},{d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,a.val,b.val, Error.Failed_Number})
+            	catch unreachable);
+        }
+
 		if (b.isZeros()) return false;
 		var r : f128 = 0;
 		r = a.val / b.val;
@@ -534,7 +712,14 @@ pub const DCMLFX = struct {
 
 	// function calculation of percentage
 	pub fn percent(dst: *DCMLFX ,a: DCMLFX , perct: DCMLFX) bool {
-		dst.isBad(); a.isBad(); perct.isBad();
+		if ( (dst.entier == 0 and dst.scale == 0) or ( a.entier == 0 and a.scale == 0) ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d}, {d},{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val,a.val,perct.val, Error.Failed_Number})
+            	catch unreachable);
+        }
+
 		if (perct.isZeros()) return false;
 		dst.val = a.val * perct.val;
 		dst.val /= 100;
@@ -543,7 +728,16 @@ pub const DCMLFX = struct {
 
 	// function val * nbr * coef   1*x * 1.25
 	pub fn rate(dst: *DCMLFX ,val: DCMLFX , nbr: DCMLFX, coef:DCMLFX) void {
-		dst.isBad(); val.isBad(); nbr.isBad(); coef.isBad();
+		if ( (dst.entier == 0 and dst.scale == 0) or
+			 ( val.entier == 0 and val.scale == 0) or
+			 ( nbr.entier == 0 and nbr.scale == 0) or
+			 ( coef.entier == 0 and coef.scale == 0) ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,dst.val, Error.Failed_Number})
+            	catch unreachable);
+        }
 		var r : f128 = 0;
 		// total htx
 		dst.val = val.val *  nbr.val;
@@ -555,7 +749,13 @@ pub const DCMLFX = struct {
 
 	// compare a , b returns EQ LT GT
 	pub fn cmp(a: DCMLFX ,b: DCMLFX) CMP {
-		a.isBad(); b.isBad();
+		if ( (a.entier == 0 and a.scale == 0) or ( b.entier == 0 and b.scale == 0) ) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d} ,{d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,a.val,b.val, Error.Failed_Number})
+            	catch unreachable);
+        }
 		const rep :  c_int  = if (a.val < b.val ) -1 else if (a.val > b.val ) 1 else 0 ;
 		switch (rep) {
 			-1 => return CMP.LT ,

@@ -82,7 +82,6 @@ pub fn main() !void {
 stdout.writeAll("\x1b[2J") catch {};
 stdout.writeAll("\x1b[3J") catch {};
 stdout.print("\x1b[{d};{d}H", .{ 1, 1 }) catch {};
-
 var work :dcml = dcml.init(15,15);
 
 
@@ -191,6 +190,7 @@ stdout.print("maintenance.{s}€\n",.{article.maintenance.string()}) catch {};
 stdout.print("prixAchat.{s}€ matière première\n",.{article.prixAchat.string()}) catch {};
 
 // benefice
+
 work.subTo(article.montVente, article.impots);
 work.subTo(work, article.salairs);
 article.benefice.subTo(work,article.maintenance);
@@ -223,6 +223,7 @@ const E_benefice = dcml.Expr{
             },
         },    
     };
+
 
     try dcml.show(&E_benefice, &stdout);
     try stdout.print(" = {d}\n", .{dcml.eval(&E_benefice)});
