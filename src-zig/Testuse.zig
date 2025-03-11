@@ -252,39 +252,58 @@ std.debug.print("\r\n b.zadd(c);  b:{s}  c:{s}\r\n",.{b.string(),c.string()});
 
 c.setDcml("12345.68541");
 c.round();
-std.debug.print("control 12345.68541 c.round()  c:{s}; \r\n",.{c.string()});
+std.debug.print("control  12345.68541 c.round()  c:{s}; \r\n",.{c.string()});
 
 c.setDcml("-12345.68451");
 c.round();
-std.debug.print("control 12345.68451 c.round()  c:{s}; \r\n",.{c.string()});
+std.debug.print("control -12345.68451 c.round()  c:{s}; \r\n",.{c.string()});
 
 c.setDcml("12345.68421");
 c.round();
-std.debug.print("control 12345.68421 c.round()  c:{s}; \r\n",.{c.string()});
+std.debug.print("control  12345.68421 c.round()  c:{s}; \r\n",.{c.string()});
 
+
+c.setDcml("-12345.68781");
+c.round();
+std.debug.print("control  12345.68781 c.round()  c:{s}; \r\n",.{c.string()});
 
 c.setDcml("12345.68781");
 c.round();
-std.debug.print("control 12345.68721 c.round()  c:{s}; \r\n",.{c.string()});
+std.debug.print("control  12345.68781 c.round()  c:{s}; \r\n",.{c.string()});
 
 
 c.setDcml("12345.68541");
 c.trunc();
-std.debug.print("control 12345.68541 c.trunc()  c:{s}; \r\n",.{c.string()});
+std.debug.print("control  12345.68541 c.trunc()  c:{s}; \r\n",.{c.string()});
 
 c.setDcml("12345.68451");
 c.trunc();
-std.debug.print("control 12345.68451 c.trunc()  c:{s}; \r\n",.{c.string()});
+std.debug.print("control  12345.68451 c.trunc()  c:{s}; \r\n",.{c.string()});
 
 c.setDcml("12345.68421");
 c.trunc();
-std.debug.print("control 12345.68421 c.trunc()  c:{s}; \r\n",.{c.string()});
+std.debug.print("control  12345.68421 c.trunc()  c:{s}; \r\n",.{c.string()});
 
 
+c.setDcml("12345.68781");
+c.trunc();
+std.debug.print("control  12345.68781 c.trunc()  c:{s}; \r\n",.{c.string()});
 c.setDcml("-12345.68781");
 c.trunc();
-std.debug.print("control 12345.68721 c.trunc()  c:{s}; \r\n",.{c.string()});
+std.debug.print("control -12345.68781 c.trunc()  c:{s}; \r\n",.{c.string()});
 
+c.setDcml("12345.68781");
+c.trunc();
+std.debug.print("control  12345.68781 c.trunc()  c:{s}; \r\n",.{c.editCodeFlt("{c}{d:>7}.{d}")});
+c.setDcml("-12345.68781");
+c.trunc();
+std.debug.print("control -12345.68781 c.trunc()  c:{s}; \r\n",.{c.editCodeInt("{c}{d:>7}")});
+c.setDcml("-12345.68781");
+c.round();
+std.debug.print("control  12345.68781 c.round()  c:{s}; \r\n",.{c.editCodeFlt("{c}{d:>7}.{d}")});
+c.setDcml("12345.68781");
+c.round();
+std.debug.print("control  12345.68781 c.round()  c:{s}; \r\n",.{c.editCodeFlt("{c}{d:>7}.{d}")});
 
 
 r.setZeros();
