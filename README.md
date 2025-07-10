@@ -26,15 +26,21 @@ Another source that inspired me and that joins what I think 1990 <br/>
 
 - [Avancement](#avancement)
 
+<br/>
 
 
-##info
+
+
+## info
 <br/>
 &nbsp;&nbsp;&nbsp;  Communication structure for default common control decimal128 - 34 digits 
 <br/>
+
+
+
+
 ## notes
 <br/>
-.<br>
 &nbsp;Respects the SQL display alignment standard based on the trim()<br/>
 
 
