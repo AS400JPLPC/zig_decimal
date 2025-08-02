@@ -3,8 +3,23 @@ const std = @import("std");
 const dcml = @import("decimal").DCMLFX;
 
 
-const stdout = std.io.getStdOut().writer();
-const stdin = std.io.getStdIn().reader();
+var out = std.fs.File.stdout().writerStreaming(&.{});
+pub inline fn Print( comptime format: []const u8, args: anytype) void {
+    out.interface.print(format, args) catch return;
+ }
+pub inline fn WriteAll( args: anytype) void {
+    out.interface.writeAll(args) catch return;
+ }
+fn Pause(msg : [] const u8 ) void{
+
+    Print("\nPause  {s}\r\n",.{msg});
+    var stdin = std.fs.File.stdin();
+    var buf: [16]u8 =  [_]u8{0} ** 16;
+    var c  : usize = 0;
+    while (c == 0) {
+        c = stdin.read(&buf) catch unreachable;
+    }
+}
 
 //=================================
 
@@ -79,9 +94,11 @@ pub const prix = struct {
 
 
 pub fn main() !void {
-stdout.writeAll("\x1b[2J") catch {};
-stdout.writeAll("\x1b[3J") catch {};
-stdout.print("\x1b[{d};{d}H", .{ 1, 1 }) catch {};
+    WriteAll("\x1b[2J");
+    WriteAll("\x1b[3J");
+    Print("\x1b[{d};{d}H", .{ 1, 1 });
+
+    
 var work :dcml = dcml.init(15,15);
 
 
@@ -89,23 +106,23 @@ var article  = prix.init ();
 // Nom de l'article
 article.name = "vis acier";
 
-stdout.print("name.{s}\n",.{article.name}) catch {};
+Print("name.{s}\n",.{article.name});
 
 // poids de la matière tonne
 article.poids.set(3.00) ;
-stdout.print("poids.{s}.T\n",.{article.poids.string()}) catch {};
+Print("poids.{s}.T\n",.{article.poids.string()});
 
 
 
 // prix de la tonne 450 €
 article.prixBase.set(450.00) ;
-stdout.print("prixBase.{s}€ par tonne \n",.{article.prixBase.string()}) catch {};
+Print("prixBase.{s}€ par tonne \n",.{article.prixBase.string()});
 
 
 
 // remise %
 article.refund.set(2.00) ;
-stdout.print("refund.{s}% remise\n",.{article.refund.string()}) catch {};
+Print("refund.{s}% remise\n",.{article.refund.string()});
 
 
 
@@ -113,33 +130,33 @@ stdout.print("refund.{s}% remise\n",.{article.refund.string()}) catch {};
 article.prixAchat.multTo(article.poids,article.prixBase) ;
 _=work.percent(article.prixAchat, article.refund);
 article.prixAchat.add(work);
-stdout.print("prixAchat.{s}€ avec remise\n",.{article.prixAchat.string()}) catch {};
+Print("prixAchat.{s}€ avec remise\n",.{article.prixAchat.string()});
 
 
 
 // prix au Gramme
 work.set(1000000);
 _=article.prixGramme.divTo(article.prixAchat,work) ;
-stdout.print("prixGramme.{s}€\n",.{article.prixGramme.string()}) catch {};
+Print("prixGramme.{s}€\n",.{article.prixGramme.string()});
 
 
 
 // poids d'une vis
 article.poidsUnite.set(4.5) ;
-stdout.print("poidsUnite.{s} poids d'une vis\n",.{article.poidsUnite.string()}) catch {};
+Print("poidsUnite.{s} poids d'une vis\n",.{article.poidsUnite.string()});
 
 
 
 // increase %
 article.increase.set(0.05) ;
-stdout.print("increase.{s}% perte fabrication\n",.{article.increase.string()}) catch {};
+Print("increase.{s}% perte fabrication\n",.{article.increase.string()});
 
 
 
 // poids fabricationi d'une vis
 _=work.percent(article.poidsUnite, article.increase) ;
 article.poidsFab.addTo(article.poidsUnite, work);
-stdout.print("poidsFab.{s}gr d'une vis\n",.{article.poidsFab.string()}) catch {};
+Print("poidsFab.{s}gr d'une vis\n",.{article.poidsFab.string()});
 
 
 
@@ -147,47 +164,47 @@ stdout.print("poidsFab.{s}gr d'une vis\n",.{article.poidsFab.string()}) catch {}
 work.set(1000000);
 work.mult(article.poids);// convert. en gramme
 _=article.nbrArticle.divTo(work,article.poidsFab);
-stdout.print("nbrArticle.{s}\n",.{article.nbrArticle.string()}) catch {};
+Print("nbrArticle.{s}\n",.{article.nbrArticle.string()});
 
 
 
 // prix de fabrication d'une vis
 article.prixFab.multTo(article.prixGramme,article.poidsFab);
-stdout.print("prixFab.{s}€ d'un article\n",.{article.prixFab.string()}) catch {};
+Print("prixFab.{s}€ d'un article\n",.{article.prixFab.string()});
 
 
 // mont de fabrication 
 article.montFab.multTo(article.prixFab,article.nbrArticle);
-stdout.print("montFab.{s}€ total d'article\n",.{article.montFab.string()}) catch {};
+Print("montFab.{s}€ total d'article\n",.{article.montFab.string()});
 
 
 
 // prix de vente
 article.prixVente.set(61.51); //cts soit 615,1€ les dix acier pour béton
-stdout.print("prixVente.{s}€ l'article\n",.{article.prixVente.string()}) catch {};
+Print("prixVente.{s}€ l'article\n",.{article.prixVente.string()});
 
 // mont de vente
 article.montVente.multTo(article.prixVente,article.nbrArticle);
-stdout.print("montVente.{s}€\n",.{article.montVente.string()}) catch {};
+Print("montVente.{s}€\n",.{article.montVente.string()});
 
 // mont de salairs integration participation
 work.set(20.0);
 _=article.salairs.percent(article.montVente,work);
-stdout.print("salairs.{s}\n",.{article.salairs.string()}) catch {};
+Print("salairs.{s}\n",.{article.salairs.string()});
 
 // mont de impots TAX
 work.set(25.0);
 _=article.impots.percent(article.montVente,work);
-stdout.print("impots.{s}€\n",.{article.impots.string()}) catch {};
+Print("impots.{s}€\n",.{article.impots.string()});
 
 
 // mont de charge maintenance investissementi epargne
 work.set(10.0);
 _=article.maintenance.percent(article.montVente,work);
-stdout.print("maintenance.{s}€\n",.{article.maintenance.string()}) catch {};
+Print("maintenance.{s}€\n",.{article.maintenance.string()});
 
 
-stdout.print("prixAchat.{s}€ matière première\n",.{article.prixAchat.string()}) catch {};
+Print("prixAchat.{s}€ matière première\n",.{article.prixAchat.string()});
 
 // benefice
 
@@ -197,11 +214,11 @@ article.benefice.subTo(work,article.maintenance);
 article.benefice.sub(article.prixAchat);
 // attention aux arrondis
 article.benefice.round();
-stdout.print("benefice.{s}\n",.{article.benefice.string()}) catch {};
+Print("benefice.{s}\n",.{article.benefice.string()});
 
 
 // autre mode de calcul avec une evaluation d'expression
-stdout.print("\n test eval-expression  result:f128 \n",.{}) catch {};
+Print("\n test eval-expression  result:f128 \n",.{});
 const E_benefice = dcml.Expr{
         .Sub = .{
             .left = &dcml.Expr{
@@ -225,26 +242,20 @@ const E_benefice = dcml.Expr{
     };
 
 
-    try dcml.show(&E_benefice, &stdout);
-    try stdout.print(" = {d}\n", .{dcml.eval(&E_benefice)});
+    try dcml.show(&E_benefice);
+    Print(" = {d}\n", .{dcml.eval(&E_benefice)});
 
     article.benefice.set(dcml.eval(&E_benefice));
     article.benefice.round();
-    stdout.print("benefice.{s}\n",.{article.benefice.string()}) catch {};
+    Print("benefice.{s}\n",.{article.benefice.string()});
 
     
 prix.deinitRecord(&article);
 
-pause("deinitDcml()");
+Pause("deinitDcml()");
 dcml.deinitDcml();
 
-pause("fin");
-}
-fn pause(text : [] const u8) void {
-    std.debug.print("{s}\n",.{text});
-    var buf : [3]u8  = [_]u8{0} ** 3;
-	_= stdin.readUntilDelimiterOrEof(buf[0..], '\n') catch unreachable;
-
+Pause("fin");
 }
 
 

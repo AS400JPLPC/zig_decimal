@@ -32,18 +32,34 @@ pub const prix = struct {
      }
 
 };
-const stdout = std.io.getStdOut().writer();
-const stdin = std.io.getStdIn().reader();
+var out = std.fs.File.stdout().writerStreaming(&.{});
+pub inline fn Print( comptime format: []const u8, args: anytype) void {
+    out.interface.print(format, args) catch return;
+ }
+pub inline fn WriteAll( args: anytype) void {
+    out.interface.writeAll(args) catch return;
+ }
+fn Pause(msg : [] const u8 ) void{
+
+    Print("\nPause  {s}\r\n",.{msg});
+    var stdin = std.fs.File.stdin();
+    var buf: [16]u8 =  [_]u8{0} ** 16;
+    var c  : usize = 0;
+    while (c == 0) {
+        c = stdin.read(&buf) catch unreachable;
+    }
+}
+
 
 pub fn main() !void {
-    stdout.writeAll("\x1b[2J") catch {};
-    stdout.writeAll("\x1b[3J") catch {};
-    stdout.print("\x1b[{d};{d}H", .{ 1, 1 }) catch {};
+    WriteAll("\x1b[2J");
+    WriteAll("\x1b[3J");
+    Print("\x1b[{d};{d}H", .{ 1, 1 });
 
 
     var vente  = prix.initRecord();
 
-    pause("setp-1");
+    Pause("setp-1");
 
     // prix moyenne voiture
     vente.base.setDcml("150.85");
@@ -54,7 +70,7 @@ pub fn main() !void {
     // number of cars sold by the group worldwide
     vente.nbritem.setDcml("100");
 
-    pause("setp-2");
+    Pause("setp-2");
 
 
     // Total Price excluding tax
@@ -63,14 +79,14 @@ pub fn main() !void {
     vente.ttc.rate(vente.base,vente.nbritem,vente.tax);
 
 
-    pause(vente.base.string());
-    pause(vente.tax.string());
-    pause(vente.htx.string());
-    pause(vente.ttc.string());
-    pause(vente.nbritem.string());
+    Pause(vente.base.string());
+    Pause(vente.tax.string());
+    Pause(vente.htx.string());
+    Pause(vente.ttc.string());
+    Pause(vente.nbritem.string());
 
 
-    pause("setp-3");
+    Pause("setp-3");
 
 
     var  i : usize = 0;
@@ -78,48 +94,48 @@ pub fn main() !void {
         vente.base.setDcml("45578.85");
     }
 
-    pause("setp-4");
+    Pause("setp-4");
 
     vente.base.setDcml("1000.00");
-    pause(vente.base.string());
+    Pause(vente.base.string());
 
 
     // count
     var count = dcml.init(5,0);
     count.setDcml("1");
-    pause(count.string());
+    Pause(count.string());
 
     i = 0;
     while(i < 10) :( i += 1) {
         vente.base.add(count);
     }
 
-    pause(vente.base.string());
+    Pause(vente.base.string());
 
-     pause("setp-5");
+    Pause("setp-5");
 
 
     prix.deinitRecord(&vente);
 
-    pause("setp-6 deinit");
+    Pause("setp-6 deinit");
 
     dcml.deinitDcml();
 
-    pause("stop");
+    Pause("stop");
     count = dcml.init(5,0);
     count.setDcml("1");
-    pause(count.string());
+    Pause(count.string());
 
 
 
 
     const e1 = dcml.Expr{ .Val = 100 };
-    try dcml.show(&e1, &stdout);
-    try stdout.print(" = {d}\n", .{dcml.eval(&e1)});
+    try dcml.show(&e1);
+    Print(" = {d}\n", .{dcml.eval(&e1)});
 
     const e2 = dcml.Expr{ .Div = .{ .left = &dcml.Expr{ .Val = 10 }, .right = &dcml.Expr{ .Val = 2 } } };
-    try dcml.show(&e2, &stdout);
-    try stdout.print(" = {d}\n", .{dcml.eval(&e2)});
+    try dcml.show(&e2);
+    Print(" = {d}\n", .{dcml.eval(&e2)});
 
 
 
@@ -134,8 +150,8 @@ pub fn main() !void {
             .right = &dcml.Expr{ .Val = 2 },
         },
     };
-    try dcml.show(&e3, &stdout);
-    try stdout.print(" = {d}\n", .{dcml.eval(&e3)});
+    try dcml.show(&e3);
+    Print(" = {d}\n", .{dcml.eval(&e3)});
 
 
     const e4 = dcml.Expr{
@@ -160,14 +176,14 @@ pub fn main() !void {
         },
     };
 
-    try dcml.show(&e4, &stdout);
-    try stdout.print(" = {d}\n", .{dcml.eval(&e4)});
+    try dcml.show(&e4);
+    Print(" = {d}\n", .{dcml.eval(&e4)});
 
 
 
     const e5 = dcml.Expr{ .Div = .{ .left = &dcml.Expr{ .Val = 100 }, .right = &dcml.Expr{ .Val = 0 } } };
-    try dcml.show(&e5, &stdout);
-    try stdout.print(" = {d}\n", .{dcml.eval(&e5)});
+    try dcml.show(&e5);
+    Print(" = {d}\n", .{dcml.eval(&e5)});
 
 
     var t1 = dcml.init(5,1); t1.set(11.2);
@@ -179,17 +195,11 @@ pub fn main() !void {
             .right = &dcml.Expr{ .Val = t2.val },
         },
     };
-    try dcml.show(&e6, &stdout);
-    try stdout.print(" = {d}\n", .{dcml.eval(&e6)});
+    try dcml.show(&e6);
+    Print(" = {d}\n", .{dcml.eval(&e6)});
 
 
 
 
 }
 
-fn pause(text : [] const u8) void {
-    std.debug.print("{s}\n",.{text});
-   	var buf : [3]u8  =	[_]u8{0} ** 3;
-	_= stdin.readUntilDelimiterOrEof(buf[0..], '\n') catch unreachable;
-
-}

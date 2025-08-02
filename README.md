@@ -1,3 +1,6 @@
+
+**attention I use the night version 0.15.dev incompatible with 0.14.1**
+
 #ZIG_DECIMAL<br>
 <br/>
 processing decimal numbers with mpdecimal as a backdrop<br/>
@@ -514,3 +517,6 @@ fn pause(text : [] const u8) void {
 ## avancement
 <br/>
 &rarr; 2025-07-10 Standardization, based on AS400 principles
+<br>
+&rarr; 2025-08-03 update version 0.15.dev 
+<br>

@@ -39,7 +39,11 @@ pub fn build(b: *std.Build) void {
     // Building the executable
     const docs = b.addTest(.{
     .name = "Testmem",
-    .root_source_file =  b.path( "./Testmem.zig" ),
+    .root_module = b.createModule(.{
+	    .root_source_file =  b.path( "./Testmem.zig" ),
+	    .target = target,
+	    .optimize = optimize,
+	    }),
     });
     docs.root_module.addImport("decimal", zenlib_dep.module("decimal"));
 

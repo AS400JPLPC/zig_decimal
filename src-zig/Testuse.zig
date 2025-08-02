@@ -4,8 +4,23 @@ const builtin = @import("builtin");
 const dcml = @import("decimal").DCMLFX;
 
 
-const stdout = std.io.getStdOut().writer();
-const stdin = std.io.getStdIn().reader();
+var out = std.fs.File.stdout().writerStreaming(&.{});
+pub inline fn Print( comptime format: []const u8, args: anytype) void {
+    out.interface.print(format, args) catch return;
+ }
+pub inline fn WriteAll( args: anytype) void {
+    out.interface.writeAll(args) catch return;
+ }
+fn Pause(msg : [] const u8 ) void{
+
+    Print("\nPause  {s}\r\n",.{msg});
+    var stdin = std.fs.File.stdin();
+    var buf: [16]u8 =  [_]u8{0} ** 16;
+    var c  : usize = 0;
+    while (c == 0) {
+        c = stdin.read(&buf) catch unreachable;
+    }
+}
 
 //=================================
 
@@ -45,9 +60,9 @@ pub const prix = struct {
 
 
 pub fn main() !void {
-stdout.writeAll("\x1b[2J") catch {};
-stdout.writeAll("\x1b[3J") catch {};
-stdout.print("\x1b[{d};{d}H", .{ 1, 1 }) catch {};
+    WriteAll("\x1b[2J");
+    WriteAll("\x1b[3J");
+    Print("\x1b[{d};{d}H", .{ 1, 1 });
 
 
 var vente  = prix.init ();
@@ -291,6 +306,13 @@ std.debug.print("control  12345.68781 c.trunc()  c:{s}; \r\n",.{c.string()});
 c.setDcml("-12345.68781");
 c.trunc();
 std.debug.print("control -12345.68781 c.trunc()  c:{s}; \r\n",.{c.string()});
+std.debug.print("control  12345.68781 c.round()  c:{s}; \r\n",.{c.strUFlt()});
+
+c.setZeros();
+
+c.trunc();
+std.debug.print("control 0.0          c.trunc()  c:{s}; \r\n",.{c.string()});
+
 
 c.setDcml("12345.68781");
 c.trunc();
@@ -304,6 +326,14 @@ std.debug.print("control  12345.68781 c.round()  c:{s}; \r\n",.{c.editCodeFlt("{
 c.setDcml("12345.68781");
 c.round();
 std.debug.print("control  12345.68781 c.round()  c:{s}; \r\n",.{c.editCodeFlt("{c}{d:>7}.{d}")});
+std.debug.print("control  12345.68781 c.round()  c:{s}; \r\n",.{c.strUFlt()});
+
+
+c.setZeros();
+c.round();
+std.debug.print("control  0.0         c.round()  c:{s}; \r\n",.{c.editCodeFlt("{c}{d:>7}.{d}")});
+std.debug.print("control  0.0         c.round()  c:{s}; \r\n",.{c.strUFlt()});
+
 
 
 r.setZeros();
@@ -325,7 +355,7 @@ std.debug.print("n.@/(2)       n:{s}; \r\n",.{n.string()});
 _=n.@"/"(3);
 std.debug.print("n.@/(3)       n:{s}; \r\n",.{n.string()});
 
-pause("deinitDcml()");
+Pause("deinitDcml()");
 dcml.deinitDcml();
 
 
@@ -336,8 +366,8 @@ dcml.deinitDcml();
             .right = &dcml.Expr{ .Val = 0 },
         },
     };
-    try dcml.show(&e0, &stdout);
-    try stdout.print(" = {d}\n", .{dcml.eval(&e0)});
+    try dcml.show(&e0);
+    Print(" = {d}\n", .{dcml.eval(&e0)});
 
     var e1 = dcml.Expr{
         .Add = .{
@@ -351,9 +381,9 @@ dcml.deinitDcml();
         }    
    
     };
-    try dcml.show(&e1, &stdout);
-    if (std.math.isNan(dcml.eval(&e1))) try stdout.print(" division par zeros\n", .{})
-    else try stdout.print(" = {d} \n", .{dcml.eval(&e1)});
+    try dcml.show(&e1);
+    if (std.math.isNan(dcml.eval(&e1))) Print(" division par zeros\n", .{})
+    else Print(" = {d} \n", .{dcml.eval(&e1)});
 
     e1 = dcml.Expr{
         .Add = .{
@@ -367,17 +397,11 @@ dcml.deinitDcml();
         }    
    
     };
-    try dcml.show(&e1, &stdout);
-    if (std.math.isNan(dcml.eval(&e1))) try stdout.print(" division par zeros\n", .{})
-    else try stdout.print(" = {d} \n", .{dcml.eval(&e1)});
+    try dcml.show(&e1);
+    if (std.math.isNan(dcml.eval(&e1))) Print(" division par zeros\n", .{})
+    else Print(" = {d} \n", .{dcml.eval(&e1)});
 
-pause("fin");
-}
-fn pause(text : [] const u8) void {
-    std.debug.print("{s}\n",.{text});
-    var buf : [3]u8  = [_]u8{0} ** 3;
-	_= stdin.readUntilDelimiterOrEof(buf[0..], '\n') catch unreachable;
+Pause("fin");
 
 }
-
 
