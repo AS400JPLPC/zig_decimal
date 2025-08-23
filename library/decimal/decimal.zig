@@ -36,9 +36,7 @@ pub const DCMLFX = struct {
 	// Definition ex: for management -> accounting, stock, order...
 	//--------------------------------------------------------------
 	pub fn deinitDcml() void {
-	    arenaDcml.deinit();
-	    arenaDcml = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-	    allocDcml = arenaDcml.allocator();
+	    _=arenaDcml.reset(.free_all);
 	}
 
 
